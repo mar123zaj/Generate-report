@@ -7,53 +7,6 @@ import csv
 import chardet
 
 
-def has_header(filename, encoding):
-    with open(filename, 'r', encoding=encoding) as csvfile:
-        sample = csvfile.read(1024)
-        has_header = csv.Sniffer().has_header(sample)
-    return has_header
-
-
-def encoding_type(filename):
-    """Get encoding type of given file"""
-
-    with open(filename, 'rb') as csvfile:
-        rawdata = csvfile.read()
-        result = chardet.detect(rawdata)
-        encoding = result['encoding']
-    return encoding
-
-
-def find_country(city):
-    """Find country from given city
-
-    Description about Geonames:
-    Geonames isn't an ideal solution because in some cases finds city even if it not suppose to find.
-    E.g. for 'Unknown' he finds 'Annaba' city in Algeria; for '-' he finds 'Mvangane' city in Cameroon etc.
-    Better way is to use Google API, but if we keep in mind that Geonames is free is not that bad option.
-    In my opinion in this case geonames will be good enough.
-    """
-    if city in ['Unknown', '-', ''] or not (city.isalpha()):
-        return 'XXX'
-    else:
-        try:
-            g = geocoder.geonames(city, key='mar123zaj')
-        except ConnectionError:
-            return False
-        except RequestException:
-            return False
-        except TimeoutError:
-            return False
-        else:
-            try:
-                country = pycountry.countries.lookup(g.country)
-            except LookupError:
-                return 'XXX'
-            else:
-                # three letter country code
-                return country.alpha_3
-
-
 def prepare_report(filename, headers=True, output_name='Report', raport_date=date.today()):
     """ Prepare report from input data
 
@@ -135,3 +88,50 @@ def prepare_report(filename, headers=True, output_name='Report', raport_date=dat
         # close file, just in case
         input_file.close()
     return 'Everything went well.'
+
+
+def has_header(filename, encoding):
+    with open(filename, 'r', encoding=encoding) as csvfile:
+        sample = csvfile.read(1024)
+        has_header = csv.Sniffer().has_header(sample)
+    return has_header
+
+
+def encoding_type(filename):
+    """Get encoding type of given file"""
+
+    with open(filename, 'rb') as csvfile:
+        rawdata = csvfile.read()
+        result = chardet.detect(rawdata)
+        encoding = result['encoding']
+    return encoding
+
+
+def find_country(city):
+    """Find country from given city
+
+    Description about Geonames:
+    Geonames isn't an ideal solution because in some cases finds city even if it not suppose to find.
+    E.g. for 'Unknown' he finds 'Annaba' city in Algeria; for '-' he finds 'Mvangane' city in Cameroon etc.
+    Better way is to use Google API, but if we keep in mind that Geonames is free is not that bad option.
+    In my opinion in this case geonames will be good enough.
+    """
+    if city in ['Unknown', '-', ''] or not (city.isalpha()):
+        return 'XXX'
+    else:
+        try:
+            g = geocoder.geonames(city, key='mar123zaj')
+        except ConnectionError:
+            return False
+        except RequestException:
+            return False
+        except TimeoutError:
+            return False
+        else:
+            try:
+                country = pycountry.countries.lookup(g.country)
+            except LookupError:
+                return 'XXX'
+            else:
+                # three letter country code
+                return country.alpha_3
