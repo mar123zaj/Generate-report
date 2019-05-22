@@ -1,10 +1,10 @@
 from requests.exceptions import RequestException, ConnectionError
-from datetime import date
 import pycountry
 import geocoder
 import datetime
 import csv
 import chardet
+
 
 def file_exists(file_path):
     try:
@@ -14,7 +14,24 @@ def file_exists(file_path):
         return False
     return True
 
-def prepare_report(filename, headers=True, output_name='Report', raport_date=date.today()):
+
+def change_date_format(date):
+    try:
+        date = datetime.datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
+    except ValueError:
+        return '-'
+    return date
+
+
+def country_code(subdivison):
+    try:
+        country_code = pycountry.subdivisions.lookup(subdivison).country_code
+    except LookupError:
+        return 'XXX'
+    return pycountry.countries.get(alpha_2=country_code).alpha_3
+
+
+def prepare_report(filename, headers=True, output_name='Report', raport_date=datetime.date.today()):
     """ Prepare report from input data
 
     :param filename: Name of input data file. Can be write without '.csv' on the end.
