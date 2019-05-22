@@ -1,4 +1,4 @@
-from report_generator import file_exists, change_date_format, country_code
+from report_generator import file_exists, change_date_format, country_code, validate_number
 
 
 def test_file_exists_False():
@@ -31,3 +31,11 @@ def test_country_code_properData2():
 
 def test_country_code_notProperData():
     assert country_code('NotRealSubdivision') == 'XXX'
+
+
+def test_validate_number_properData():
+    assert validate_number('31') == 31
+
+
+def test_validate_number_notProperData():
+    assert validate_number('A') == '?'

@@ -31,28 +31,29 @@ def country_code(subdivison):
     return pycountry.countries.get(alpha_2=country_code).alpha_3
 
 
-def prepare_report(filename, headers=True, output_name='Report', raport_date=datetime.date.today()):
+def validate_number(number):
+    try:
+        number = int(number)
+    except ValueError:
+        return '?'
+    return number
+
+
+def prepare_report(file_name, headers=True, output_name='Report', report_date=datetime.date.today()):
     """ Prepare report from input data
 
-    :param filename: Name of input data file. Can be write without '.csv' on the end.
+    :param file_name: Name of input data file. Can be write without '.csv' on the end.
     :param headers: True or False if we want or don't want headers in output file. (default True)
     :param output_name: First part of output file name. (default 'Report')
-    :param raport_date: Second part of output file name. This is date of preparing report. (default this day)
-    :type filename: str
+    :param report_date: Second part of output file name. This is date of preparing report. (default this day)
+    :type file_name: str
     :type headers: bool
     :type output_name: str
-    :type raport_date: str
+    :type report_date: str
     :return: Information if the report was generated without problems.
     """
 
-    if '.csv' not in filename:
-        filename += '.csv'
-
-    # check if file exist
-    try:
-        open(filename)
-    except FileNotFoundError as e:
-        return e
+    file_name += '.csv'
 
     # find encoding of input file
     encoding = encoding_type(filename)
@@ -71,23 +72,12 @@ def prepare_report(filename, headers=True, output_name='Report', raport_date=dat
             report.writerow(['Date', 'Country', 'Number of impressions', 'Number of clicks'])
 
         report_data = list()
-        for line in input_rows:
+        for date, subdivision, impressions, ctr in input_rows:
             report_rows = list()
 
-            try:
-                report_rows.append(datetime.datetime.strptime(line[0], '%d/%m/%y').strftime('%Y-%m-%d'))
-            except ValueError:
-                print('Not proper data type.')
-                report_rows.append('-')
+            impressions = validate_number(impressions)
 
-            # find country from city
-            if find_country(line[1]):
-                report_rows.append(find_country(line[1]))
-            else:
-                return 'Something went wrong in connection with Geonames.'
 
-            # number of impressions
-            report_rows.append(line[2])
 
             try:
                 impressions = int(line[2])
@@ -108,9 +98,6 @@ def prepare_report(filename, headers=True, output_name='Report', raport_date=dat
         sorted_data = sorted(report_data, key=lambda row: (row[0], row[1]))
         for line in sorted_data:
             report.writerow(line)
-
-        # close file, just in case
-        input_file.close()
     return 'Everything went well.'
 
 
