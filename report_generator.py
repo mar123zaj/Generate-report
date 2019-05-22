@@ -6,6 +6,13 @@ import datetime
 import csv
 import chardet
 
+def file_exists(file_path):
+    try:
+        f = open(file_path)
+        f.close()
+    except FileNotFoundError:
+        return False
+    return True
 
 def prepare_report(filename, headers=True, output_name='Report', raport_date=date.today()):
     """ Prepare report from input data
