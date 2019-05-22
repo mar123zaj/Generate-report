@@ -39,6 +39,9 @@ def validate_number(number):
     return number
 
 
+def validate_percent():
+    pass
+
 def prepare_report(file_name, headers=True, output_name='Report', report_date=datetime.date.today()):
     """ Prepare report from input data
 
@@ -56,15 +59,15 @@ def prepare_report(file_name, headers=True, output_name='Report', report_date=da
     file_name += '.csv'
 
     # find encoding of input file
-    encoding = encoding_type(filename)
+    encoding = encoding_type(file_name)
 
     with open(output_name + ' ' + str(raport_date) + '.csv', 'w', encoding='utf-8') as output_file, \
-            open(filename, encoding=encoding) as input_file:
+            open(file_name, encoding=encoding) as input_file:
         input_rows = list(csv.reader(input_file))
         report = csv.writer(output_file, delimiter=',', lineterminator='\n')  # lineterminator for Unix line endings
 
         # check if input file has headers
-        if has_header(filename, encoding):
+        if has_header(file_name, encoding):
             input_rows = input_rows[1:]
 
         # give headers to output file for data readability
@@ -84,11 +87,7 @@ def prepare_report(file_name, headers=True, output_name='Report', report_date=da
             except ValueError as e:
                 return e
 
-            try:
-                # making real percent value
-                ctr = float(line[3][:-1]) / 100
-            except ValueError as e:
-                return e
+            ctr = validate_percent(ctr)
 
             # calculate number of clicks
             report_rows.append(round(impressions * ctr, 2))
