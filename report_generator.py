@@ -90,10 +90,9 @@ def prepare_report(file_name, output_name='Report'):
 
 
 def has_header(filename, encoding):
-    with open(filename, 'r', encoding=encoding) as csvfile:
+    with open(filename, 'r') as csvfile:
         sample = csvfile.read(1024)
-        has_header = csv.Sniffer().has_header(sample)
-    return has_header
+    return csv.Sniffer().has_header(sample)
 
 
 def encoding_type(filename):
